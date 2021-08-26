@@ -9,7 +9,7 @@ void triangle(int n)
 {
 	int start_ind = (2*n - 1) / 2;
 	int stop_ind = start_ind;
-	for(int j = 0; j < n; j++){
+	for(int j = 0; j < n; j++) {
 		for(int i = 0; i < (2*n - 1); i++) {
 			if(i < start_ind || i > stop_ind) {
 				putchar(' ');

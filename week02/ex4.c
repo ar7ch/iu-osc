@@ -9,7 +9,8 @@ void swap(int * a, int * b)
 	*b = tmp;
 }
 
-int main() {
+int main() 
+{
 	int a, b;
 	printf("a: ");
 	check_code(scanf("%d", &a));

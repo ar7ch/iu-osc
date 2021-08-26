@@ -3,7 +3,8 @@
 
 #define BUF_SIZE 160
 
-int main() {
+int main() 
+{
 	printf("Input a string: ");
 	char buf[BUF_SIZE] = {0};
 	fgets(buf, BUF_SIZE, stdin);
