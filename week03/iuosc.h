@@ -2,6 +2,7 @@
 
 #ifndef IUOSC_H
 #define IUOSC_H
+#include <string.h>
 
 int return_code;
 
@@ -25,4 +26,12 @@ int io_fail(char * fgets_return) {
 	return 0;
 }
 
+int fgets_wrap(char * buf, size_t bufsize, FILE * stream, char * prompt) {
+	memset(buf, 0, bufsize);
+	do {
+		printf("%s", prompt);
+		if (io_fail(fgets(buf, bufsize, stdin))) { return -1; }			
+	} while(strlen(buf) < 2);
+	return 0;
+} 
 #endif
