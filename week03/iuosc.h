@@ -3,6 +3,8 @@
 #ifndef IUOSC_H
 #define IUOSC_H
 
+int return_code;
+
 void check_code(int code) {
 	if (!code) {
 		fprintf(stderr, "error: please provide numerical value\n");

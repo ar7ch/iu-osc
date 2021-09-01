@@ -1,5 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "iuosc.h"
+
+#define BUF_SIZE 100
 
 int partition(int * a, int n) {
 	int tmp;
@@ -41,15 +45,41 @@ void quicksort(int * a, int n) {
 	
 }
 
-int main(int argc, char ** argv) {
+int main()
+{
+	char buf[BUF_SIZE] = {0};
+	char * token;
+	char reentry = 0;
 	int n;
-	sscanf(argv[1], "%d", &n);
+	do {
+		printf("Input n: ");
+		if(io_fail(fgets(buf, BUF_SIZE, stdin))) {return EXIT_FAILURE;}
+	} while(strlen(buf) < 2);
+	check_code(sscanf(buf, "%d", &n));
+	if (n < 1) { printf("error: n must be nonnegative integer\n"); return EXIT_FAILURE; }
 	int * a = malloc(sizeof(int) * n);
-	for(int i = 0; i < n; i++) { scanf("%d", &(a[i])); }
+	do {
+		printf("Input array elements: ");
+		if(io_fail(fgets(buf, BUF_SIZE, stdin))) { return_code = EXIT_FAILURE; goto exit; }
+	} while(strlen(buf) < 2);
+	for(int i = 0; i < n; ++i) {
+		if(!reentry) {
+			token = strtok(buf, " ");
+			reentry = 1;
+		}
+		else {
+			token = strtok(NULL, " ");
+		}
+		if(token == NULL) break;
+		check_code(sscanf(token, "%d", &(a[i])));
+	}
 	quicksort(a, n);
-	for(int i = 0; i < n; i++) {
+	printf("Sorted array: ");
+	for(int i = 0; i < n; ++i) {
 		printf("%d ", a[i]);
 	}
-	puts("");
-	return 0;
+	printf("\n");
+	exit:
+	free(a);
+	return return_code;
 }
