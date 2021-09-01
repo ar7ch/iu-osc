@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "iuosc.h"
 
-#define BUF_SIZE 10
+#define BUF_SIZE 100
 
 struct node {
 	int value;
@@ -15,7 +15,7 @@ struct linked_list {
 	int len;
 };
 
-struct linked_list ll_init() 
+struct linked_list new_ll() 
 {
 	struct linked_list list;
 	list.len = 0;
@@ -24,7 +24,7 @@ struct linked_list ll_init()
 	return list;
 }
 
-int ll_destruct(struct linked_list * list) {
+int delete_ll(struct linked_list * list) {
 	struct node * cur_node = list->first;
 	int deleted = 0;
 	while(cur_node != NULL) {
@@ -47,6 +47,7 @@ int append_node(struct linked_list * list, int value) {
 	}
 	else {
 		(list->last)->next = nd;
+		list->last = nd;
 	}
 	list->len += 1;
 	return list->len;
@@ -60,33 +61,33 @@ int insert_node(struct linked_list * list, int after_ind, int value) {
 	 *  len of list == 1: second element -> append case
 	 *  len of list > 1: insert case
 	 */
-	if (after_ind < 0) return -1;
-	if (after_ind == list->len || list->len < 1) {
+	if (after_ind == ((list->len)-1) || list->len < 1) {
 		return append_node(list, value);
 	}
+	else if (after_ind < 0  || after_ind >= list->len) { return -1; }
 	else {
 		struct node * nd = malloc(sizeof(struct node)); if (nd == NULL) return -1;
 		nd->value = value;
 		struct node * cur_node = list->first;
-		for(int i = 1; i < after_ind; ++i) {
+		for(int i = 0; i < after_ind; ++i) {
 			if(!is_null(cur_node->next)) {
 				cur_node = cur_node->next;
 			}
 		}
-		if(after_ind == 0) {
+		/*if(after_ind == 1) {
 			nd->next = list->first;
 			list->first = nd;
-		} else {
+		} else {*/
 			nd->next = cur_node->next;
 			cur_node->next = nd;
-		}
+		//}
 		list->len += 1;
 		return list->len;
 	}
 }
 
 int delete_node(struct linked_list * list, int ind) {
-	if (ind > list->len || ind < 1) { return -1; }
+	if (ind >= list->len || ind < 0) { return -1; }
 	if (list->len == 0) { return 0; }
 	if (list->len == 1) {
 		free(list->first);
@@ -101,22 +102,22 @@ int delete_node(struct linked_list * list, int ind) {
 		    erase needed and rewrite next
 		*/
 		struct node * cur_node = list->first;
-		for(int i = 1; i < ind-1; i++) {
+		for(int i = 0; i < ind-1; i++) {
 			if (!is_null(cur_node)) {
 				cur_node = cur_node->next;	
 			} else return -1;
 		}
 		if (!is_null(cur_node)) {
 			struct node * to_be_deleted = cur_node;
-			if(ind != 1) {
+			if(ind != 0) {
 				if (!is_null(cur_node->next)) {
 					to_be_deleted = cur_node->next;
 					cur_node->next = to_be_deleted->next;
 					if(ind == list->len) list->last = cur_node;
 				} else return -1;
 			}
-			else if(ind == 1) {  
-				list->first = cur_node->next;
+			else{  
+				list->first = to_be_deleted->next;
 			}
 			free(to_be_deleted);
 			list->len -= 1;
@@ -124,8 +125,8 @@ int delete_node(struct linked_list * list, int ind) {
 	}
 	return ind;
 }
-
 void print_list(struct linked_list * list) {
+	if (list->len == 0) { printf("(empty list)\n"); return; }
 	struct node * cur_node = list->first;
 	while(cur_node != NULL) {
 		printf("%d ", cur_node->value);
@@ -136,15 +137,15 @@ void print_list(struct linked_list * list) {
 
 int main() 
 {
-	struct linked_list list = ll_init();
+	struct linked_list list = new_ll();
 	int cmd, tmp, code, tmp2;
 	printf("Empty list inited\n");
 	while(1) {
 		printf("==================================================================================================================\n");
-		printf("Choose command: 1 - get list length, 2 - remove i-th element, 3 - add element, 4 - print list contents, 5 - exit\n");
-		printf("Choice: ");
+		printf("Choose command: 1 - get list length, 2 - remove i-th element, 3 - add element (after another), 4 - print list contents, 5 - exit\n");
 		char buf[BUF_SIZE] = {0};
-		if (io_fail(fgets(buf, BUF_SIZE, stdin))) { goto exit; }
+		char buf2[BUF_SIZE] = {0};
+		if (fgets_wrap(buf, BUF_SIZE, stdin, "Choice: ") == -1) { return_code = EXIT_FAILURE; goto exit; }
 		check_code(sscanf(buf, "%d", &cmd));
 		switch (cmd) {
 			case 1:
@@ -155,31 +156,38 @@ int main()
 					printf("ERROR: list is empty, nothing to remove\n");
 					break;
 				}
-				printf("Enter number of element to be removed (%d..%d): ", 1, list.len);
 				int ind;
-				if (io_fail(fgets(buf, BUF_SIZE, stdin))) { goto exit; }
+				sprintf(buf2, "Enter index of element to be removed (%d..%d): ", 1, list.len);
+				if (fgets_wrap(buf, BUF_SIZE, stdin, buf2) == -1) { return_code = EXIT_FAILURE; goto exit; }
 				check_code(sscanf(buf, "%d", &ind));
+				--ind;
 				code = delete_node(&list, ind);
 				if (code != -1) {
-					printf("OK: delete element #%d\n", code);
+					printf("OK: delete element #%d\n", code+1);
 				}
 				else {
-					printf("ERROR: delete failed, make sure that index is in bounds from %d to %d", 1, list.len);
+					printf("ERROR: delete failed, make sure that index is in bounds from %d to %d\n", 1, list.len);
 				}
 				break;
 			case 3:
-				printf("Enter the value of new element: ");
-				if (io_fail(fgets(buf, BUF_SIZE, stdin))) { goto exit; }
+				if (fgets_wrap(buf, BUF_SIZE, stdin, "Enter the value of new element: ") == -1) { return_code = EXIT_FAILURE; goto exit; }
 				check_code(sscanf(buf, "%d", &tmp));
-				printf("After which element do you want to insert the element? (%d..%d): ", 0, list.len);
-				fgets(buf, BUF_SIZE, stdin);
-				check_code(sscanf(buf, "%d", &tmp2));
+				if(list.len != 0) {
+					sprintf(buf2, "After which element do you want to insert the element? (%d..%d): ", 1, list.len);
+					if (fgets_wrap(buf, BUF_SIZE, stdin, buf2) == -1) { return_code = EXIT_FAILURE; goto exit; }
+					check_code(sscanf(buf, "%d", &tmp2));
+					--tmp2;
+				}
+				else {
+					printf("The list is empty, no index prompt for this time\n");
+					tmp2 = 0;
+				}
 				code = insert_node(&list, tmp2, tmp);
 				if (code != -1) {
 					printf("OK: add element with value %d\n", tmp);
 				}
 				else {
-					printf("ERROR: failed to add element, make sure that index is in bounds from %d to %d\n", 0, list.len);
+					printf("ERROR: failed to add element, make sure that index is in bounds from %d to %d\n", 1, list.len);
 				}
 				break;
 			case 4: 
@@ -194,6 +202,6 @@ int main()
 		}
 	}
 	exit:
-	ll_destruct(&list);	
+	delete_ll(&list);	
 	return 0;
 }
