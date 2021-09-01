@@ -24,6 +24,7 @@ struct linked_list new_ll()
 	return list;
 }
 
+
 int delete_ll(struct linked_list * list) {
 	struct node * cur_node = list->first;
 	int deleted = 0;
@@ -52,6 +53,7 @@ int append_node(struct linked_list * list, int value) {
 	list->len += 1;
 	return list->len;
 }
+
 
 int insert_node(struct linked_list * list, int after_ind, int value) {
 	/* consider possible values:	
@@ -85,6 +87,7 @@ int insert_node(struct linked_list * list, int after_ind, int value) {
 		return list->len;
 	}
 }
+
 
 int delete_node(struct linked_list * list, int ind) {
 	if (ind >= list->len || ind < 0) { return -1; }
@@ -125,6 +128,8 @@ int delete_node(struct linked_list * list, int ind) {
 	}
 	return ind;
 }
+
+
 void print_list(struct linked_list * list) {
 	if (list->len == 0) { printf("(empty list)\n"); return; }
 	struct node * cur_node = list->first;
@@ -134,6 +139,7 @@ void print_list(struct linked_list * list) {
 	}
 	printf("\n");
 }
+
 
 int main() 
 {

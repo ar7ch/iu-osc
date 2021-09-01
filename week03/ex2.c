@@ -23,6 +23,7 @@ void bubble_sort(int * a, size_t n)
 	} while(!sorted);
 }
 
+
 int main()
 {
 	char buf[BUF_SIZE] = {0};

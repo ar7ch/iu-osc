@@ -5,7 +5,8 @@
 
 #define BUF_SIZE 100
 
-int partition(int * a, int n) {
+int partition(int * a, int n) 
+{
 	int tmp;
 	int l = -1;
 	int r = n;
@@ -32,7 +33,9 @@ int partition(int * a, int n) {
 	}
 }
 
-void quicksort(int * a, int n) { 
+
+void quicksort(int * a, int n) 
+{ 
 		for(int i = 0; i < n; i++) printf("%d ", a[i]);
 		printf("|%d", n);
 		puts("");

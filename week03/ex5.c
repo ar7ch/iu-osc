@@ -25,7 +25,9 @@ struct linked_list new_ll()
 	return list;
 }
 
-int delete_ll(struct linked_list * list) {
+
+int delete_ll(struct linked_list * list)
+{
 	struct node * cur_node = list->first;
 	int deleted = 0;
 	while(cur_node != NULL) {
@@ -37,13 +39,17 @@ int delete_ll(struct linked_list * list) {
 	return deleted;
 }
 
-struct node * new_node(int value) {
+
+struct node * new_node(int value)
+{
 	struct node * nd = malloc(sizeof(struct node));
 	nd->value = value;
 	return nd;
 }
 
-struct node * node_by_ind(struct linked_list * list, int ind) {
+
+struct node * node_by_ind(struct linked_list * list, int ind)
+{
 	if(ind > list->len || ind < 0) return NULL;
 	struct node * cur_node = list->first;
 	for(int i = 0; i < ind; ++i) {
@@ -55,7 +61,8 @@ struct node * node_by_ind(struct linked_list * list, int ind) {
 }
 
 
-int insert_node_after(struct linked_list * list, struct node * old_node, struct node * new_node) {
+int insert_node_after(struct linked_list * list, struct node * old_node, struct node * new_node)
+{
 	if(list->len == 0) {
 		puts("Initial insertion");
 		list->first = new_node;
@@ -83,7 +90,8 @@ int insert_node_after(struct linked_list * list, struct node * old_node, struct 
 }
 
 
-int insert_node_before(struct linked_list * list, struct node * old_node, struct node * new_node) {
+int insert_node_before(struct linked_list * list, struct node * old_node, struct node * new_node)
+{
 	if(list->len == 0) {
 		list->first = new_node;
 		list->last = new_node;
@@ -103,7 +111,9 @@ int insert_node_before(struct linked_list * list, struct node * old_node, struct
 	return list->len;
 }
 
-int delete_node(struct linked_list * list, struct node * node_to_delete) {
+
+int delete_node(struct linked_list * list, struct node * node_to_delete)
+{
 	if(is_null(node_to_delete)) return -1;
 	printf("deleting node with value %d\n", node_to_delete->value);
 	struct node * prev_node = node_to_delete->prev;
@@ -132,7 +142,9 @@ int delete_node(struct linked_list * list, struct node * node_to_delete) {
 	return list->len;
 }
 
-void print_list(struct linked_list * list) {
+
+void print_list(struct linked_list * list)
+{
 	if (list->len == 0) { printf("(empty list)\n"); return; }
 	struct node * cur_node = list->first;
 	while(cur_node != NULL) {
@@ -141,6 +153,7 @@ void print_list(struct linked_list * list) {
 	}
 	printf("\n");
 }
+
 
 int main() 
 {
