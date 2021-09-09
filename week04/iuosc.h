@@ -4,8 +4,7 @@
 #define IUOSC_H
 #include <string.h>
 
-
-int return_code;
+int return_code = 0;
 
 void check_code(int code) {
 	if (!code) {
@@ -31,8 +30,9 @@ int fgets_wrap(char * buf, size_t bufsize, FILE * stream, char * prompt) {
 	memset(buf, 0, bufsize);
 	do {
 		printf("%s", prompt);
-		if (io_fail(fgets(buf, bufsize, stdin))) { return -1; }			
+		if (io_fail(fgets(buf, bufsize, stdin))) { return -1; }	
 	} while(strlen(buf) < 2);
+	buf[strcspn(buf, "\n")] = 0;
 	return 0;
 } 
 #endif
