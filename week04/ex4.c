@@ -9,7 +9,10 @@
 #define BUF_ARR_SIZE 10
 #define SHELL_PROMPT "shell -> "
 
+//struct linked_list procs;
+
 void sigchld_handler() {
+	puts("recieved SIGCHLD");
 	pid_t pid = wait(NULL);
 	if (pid == -1) {
 		/// TODO add table of child processes to determine job number and was the process in bg or not
@@ -26,6 +29,9 @@ int exec_wrapper(char * buf) {
 		run_bg = 1;
 		buf[strlen(buf)-1] = '\0';
 	}
+	if(!run_bg) {
+		signal(SIGCHLD, SIG_IGN);
+	}
 	pid_t pid = fork();
 	if(pid == 0) {
 		int i;
@@ -33,7 +39,6 @@ int exec_wrapper(char * buf) {
 		char * args[BUF_ARR_SIZE+1];
 		int ret = 0;
 
-		//strcat(cmd, BIN_DIR);
 		strcat(cmd, strtok(buf, " "));
 		args[0] = cmd; // execve convention
 		for(i = 1; (args[i] = strtok(NULL, " ")) != NULL; i++);
@@ -47,30 +52,33 @@ int exec_wrapper(char * buf) {
 		printf("error: cannot fork\n");
 		return -1;
 	}
-	else  {
+	else {
 		if(!run_bg) {
-			wait(NULL);
+			waitpid(pid, NULL, WNOHANG);
 		}
 		else {
 			printf("[%d] started in bg, PID %d\n", 0, pid);
 		}
-		//puts("forked");
 		usleep(50000);
 	}
 	return 0;
 }
 
 int shell_loop() {
-	signal(SIGCHLD, &sigchld_handler);
+	pid_t child_pid;
 	while(1) {
+		signal(SIGCHLD, &sigchld_handler);
 		char buf[BUF_SIZE] = {0};
 		if (fgets_wrap(buf, BUF_SIZE, stdin, SHELL_PROMPT) == -1) {return_code = EXIT_FAILURE; goto exit;}
-		if (exec_wrapper(buf) == -1) {return_code = EXIT_FAILURE; goto exit;}
+		if ((child_pid = exec_wrapper(buf)) == -1) {
+			return_code = EXIT_FAILURE; goto exit;
+		}
 	}
 exit:
 	return return_code;
 }
 
 int main() {
+	//procs = new_ll();
 	return shell_loop();	
 }
