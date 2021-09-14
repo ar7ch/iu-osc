@@ -9,17 +9,13 @@
 #define BUF_ARR_SIZE 10
 #define SHELL_PROMPT "shell -> "
 
-//struct linked_list procs;
-
 void sigchld_handler() {
-	puts("recieved SIGCHLD");
 	pid_t pid = wait(NULL);
 	if (pid == -1) {
-		/// TODO add table of child processes to determine job number and was the process in bg or not
-		//fprintf(stderr, "child process error\n");
+		fprintf(stderr, "child process error\n");
 	} 
 	else {
-		printf("[%d]+  done bg process, PID %d\n", 0, pid);
+		printf("done bg process with PID %d\n", pid);
 	}
 }
 
@@ -57,7 +53,7 @@ int exec_wrapper(char * buf) {
 			waitpid(pid, NULL, WNOHANG);
 		}
 		else {
-			printf("[%d] started in bg, PID %d\n", 0, pid);
+			printf("started in bg, PID %d\n", 0, pid);
 		}
 		usleep(50000);
 	}
@@ -67,7 +63,6 @@ int exec_wrapper(char * buf) {
 int shell_loop() {
 	pid_t child_pid;
 	while(1) {
-		signal(SIGCHLD, &sigchld_handler);
 		char buf[BUF_SIZE] = {0};
 		if (fgets_wrap(buf, BUF_SIZE, stdin, SHELL_PROMPT) == -1) {return_code = EXIT_FAILURE; goto exit;}
 		if ((child_pid = exec_wrapper(buf)) == -1) {
