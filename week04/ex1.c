@@ -6,6 +6,9 @@
 /*
 program  will create 2^10 = 1024 processes 
 */
+
+/* I think the lab exercise statement is slightly different, but I did as TA said to implement */
+
 int main() {
 	pid_t n_child;
 	for(int i = 1; i <= 10; i++) {

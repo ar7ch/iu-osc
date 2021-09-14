@@ -7,7 +7,22 @@
 
 #define BUF_SIZE 100
 #define BUF_ARR_SIZE 10
-#define SHELL_PROMPT "shell -> "
+
+char shell_prompt[2*BUF_SIZE];
+
+void generate_prompt() {
+	char hostname[BUF_SIZE] =  {0};
+	char * username = getenv("USER");
+	if (is_null(username) || (gethostname(hostname, BUF_SIZE) == -1)) {
+		strcat(shell_prompt, "shell");
+	}
+	else { 
+		strcat(shell_prompt, username);
+		strcat(shell_prompt, "@");
+		strcat(shell_prompt, hostname);
+	}
+	strcat(shell_prompt, " -> ");
+}
 
 void sigchld_handler() {
 	pid_t pid = wait(NULL);
@@ -15,15 +30,18 @@ void sigchld_handler() {
 		fprintf(stderr, "child process error\n");
 	} 
 	else {
-		printf("done bg process with PID %d\n", pid);
+		printf("\ndone bg process with PID %d (press enter to return to prompt)\n", pid);
 	}
 }
 
 int exec_wrapper(char * buf) {
 	char run_bg = 0;
-	if (buf[strlen(buf)-1] == '&') {
-		run_bg = 1;
-		buf[strlen(buf)-1] = '\0';
+	size_t buf_len = strlen(buf);
+	if (buf[buf_len-1] == '&' && buf_len != 1) {
+		if(buf[buf_len-2] == ' ') {
+			run_bg = 1;
+			buf[strlen(buf)-1] = '\0';
+		}
 	}
 	if(!run_bg) {
 		signal(SIGCHLD, SIG_IGN);
@@ -53,7 +71,7 @@ int exec_wrapper(char * buf) {
 			waitpid(pid, NULL, WNOHANG);
 		}
 		else {
-			printf("started in bg, PID %d\n", 0, pid);
+			printf("started in bg, PID %d\n", pid);
 		}
 		usleep(50000);
 	}
@@ -61,10 +79,13 @@ int exec_wrapper(char * buf) {
 }
 
 int shell_loop() {
+	puts("simplistic shell");
 	pid_t child_pid;
+	generate_prompt();
 	while(1) {
+		signal(SIGCHLD, &sigchld_handler);
 		char buf[BUF_SIZE] = {0};
-		if (fgets_wrap(buf, BUF_SIZE, stdin, SHELL_PROMPT) == -1) {return_code = EXIT_FAILURE; goto exit;}
+		if (fgets_wrap(buf, BUF_SIZE, stdin, shell_prompt) == -1) {return_code = EXIT_FAILURE; goto exit;}
 		if ((child_pid = exec_wrapper(buf)) == -1) {
 			return_code = EXIT_FAILURE; goto exit;
 		}
@@ -74,6 +95,5 @@ exit:
 }
 
 int main() {
-	//procs = new_ll();
 	return shell_loop();	
 }

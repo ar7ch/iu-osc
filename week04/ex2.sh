@@ -1,4 +1,4 @@
 #!/bin/bash
 
-./ex2 &
+./ex2 & 
 pstree
