@@ -1,15 +1,9 @@
 file=two.txt
 lock=two.lock
 maxlines=150
-#for c in {1..$maxlines}
+
 while [ 1 -eq 1 ]
 do
-#if [ $(wc -l $file) -ge $maxlines ]
-#then
-#	echo "file full"
-#	break
-#fi
-
 	if [ ! -f $file ]
 	then
 		echo "file not found, creating"
@@ -26,8 +20,10 @@ do
 		fi
 	done
 	if [ $entry -eq 1 ] ; then echo "busy waiting done" ; fi
-	rm -f $lock
-	ln $file $lock
+
+	touch $lock
+	if [ -f $lock ] ; then echo "created lock file" ; fi
+
 	line=$(tail -n 1 $file)
 	if [ $((line)) -ge $maxlines ] 
 	then 
@@ -40,4 +36,5 @@ do
 	echo "written $tmp to file"
 	sleep 5
 	rm -f $lock
+	sleep 5
 done
