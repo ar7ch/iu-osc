@@ -1,6 +1,15 @@
+#!/bin/bash
+
+# to see the results clearer, run two ex2.sh
+# processes in different windows
+# (see ex2_screenshot.png)
+
 file=two.txt
 lock=two.lock
 maxlines=150
+sleeptime=2
+
+if [ -f $lock ] ; then sleep 0.5 ; fi
 
 while [ 1 -eq 1 ]
 do
@@ -34,7 +43,8 @@ do
 	tmp=$((line+1))
 	echo "$tmp" >> $file
 	echo "written $tmp to file"
-	sleep 5
+	sleep $sleeptime
 	rm -f $lock
-	sleep 5
+	sleep $sleeptime
 done
+
