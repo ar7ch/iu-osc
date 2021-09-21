@@ -8,7 +8,7 @@
 
 #define BUF_SIZE 5
 
-#define SLEEP_TIME 500000UL
+#define SLEEP_TIME 500000UL // 0.5s
 
 #define PRODUCER 0
 #define CONSUMER 1
@@ -17,7 +17,7 @@
    but the lab statement says only about handling full and empty conditions, so I did as was required
 */
 
-static int buf[BUF_SIZE];
+static int buf[BUF_SIZE] = { 0 };
 static int slots = 0;
 static pthread_t consumer_thread;
 static pthread_t producer_thread;
@@ -38,7 +38,6 @@ void psleep(int process) {
 void * producer(void * data) {
 	puts("hello from producer thread");
 	while(1) {
-		//printf("slots: %d", slots);
 		if (slots == BUF_SIZE) {
 			--slots;
 			puts("PRODUCER: buffer is full");
