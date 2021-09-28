@@ -15,6 +15,9 @@ void scheduler_fifo(process * ptable, size_t n)
 }
 
 int main() {
+	printf("===================================\n"
+	"First-come first-served scheduler\n"
+	"===================================\n");
 	int n;
 	get_int(&n, "input number of processes: ");
 	process * ptable = get_ptable(n);

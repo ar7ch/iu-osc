@@ -34,6 +34,9 @@ void scheduler_shortest_first(process * p, int n)
 }
 
 int main() {
+	printf("===================================\n"
+	"Shortest task first scheduler\n"
+	"===================================\n");
 	int n;
 	get_int(&n, "input number of processes: ");
 	process * ptable = get_ptable(n);
