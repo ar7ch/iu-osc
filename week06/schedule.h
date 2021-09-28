@@ -20,6 +20,7 @@
 typedef struct {
 	int arrival_time;
 	int burst_time;
+	int exec_time_left;
 	int completion_time;
 	int turnaround_time;
 	int waiting_time;
@@ -79,6 +80,7 @@ process * get_ptable(int n) {
 		ptable[i].completion_time = 0;
 		ptable[i].turnaround_time = 0;
 		ptable[i].waiting_time = 0;
+		ptable[i].exec_time_left = bt;
 		ptable[i].arrival_time = at;
 		ptable[i].burst_time = bt;
 		ptable[i].done = FALSE;

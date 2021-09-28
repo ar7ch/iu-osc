@@ -4,13 +4,18 @@
 #define IUOSC_H
 #include <string.h>
 
+#ifndef BUF_SIZE
+#define BUF_SIZE 50
+#endif
+
 int return_code = 0;
 
-void check_code(int code) {
+int check_int(int code) {
 	if (!code) {
 		fprintf(stderr, "error: please provide numerical value\n");
 		exit(EXIT_FAILURE);
 	}
+	return 1;
 }
 
 int is_null(void * ptr) {
@@ -35,4 +40,12 @@ int fgets_wrap(char * buf, size_t bufsize, FILE * stream, char * prompt) {
 	buf[strcspn(buf, "\n")] = 0;
 	return 0;
 } 
+
+int get_int(int * n, char * prompt) {
+	char buf[BUF_SIZE];
+	int code= 0;
+	fgets_wrap(buf, BUF_SIZE, stdin, prompt); 
+	if(check_int(sscanf(buf, "%d", n))) return 0;
+
+}
 #endif

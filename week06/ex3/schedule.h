@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "iuosc.h"
 
 typedef struct {
 	int arrival_time;
@@ -57,12 +58,6 @@ void proc_print_report(process * procs, int n)
 	att = att / n;
 	printf("Average Turnaround Time = %f\nAverage Waiting Time = %f\n", att, awt);
 }
-
-void get_int(int * n, char * prompt) {
-	printf("%s", prompt);
-	scanf("%d", n);
-}
-
 
 process * get_ptable(int n) {
 	char buf[BUF_SIZE];
