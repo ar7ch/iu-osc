@@ -19,6 +19,7 @@
 #include "iuosc.h"
 
 typedef struct {
+	int proc_num;
 	int arrival_time;
 	int burst_time;
 	int exec_time_left;
@@ -29,11 +30,29 @@ typedef struct {
 	int done;
 } process;
 
+int comp_by_proc_num(const void * a, const void * b) {
+	process * p1 = (process *) a;
+	process * p2 = (process *) b;
+	return p1->proc_num - p2->proc_num;
+}
+
+int comp_by_burst_time(const void * a, const void * b) {
+	process * p1 = (process *) a;
+	process * p2 = (process *) b;
+	return p1->burst_time - p2->burst_time;
+}
+
+int comp_by_arrival_time(const void * a, const void * b) {
+	process * p1 = (process *) a;
+	process * p2 = (process *) b;
+	return p1->arrival_time - p2->arrival_time;
+}
+
 void proc_fill_timedata(process * proc, int * time_passed)
 {
 	proc->completion_time = *time_passed + proc->burst_time; // time from the very beginning to the process termination
 	proc->waiting_time = *time_passed - proc->arrival_time; // time passed before the beginning of execution
-	printf("waiting time: %d\n", proc->waiting_time);
+	//printf("waiting time: %d\n", proc->waiting_time);
 	proc->turnaround_time = proc->completion_time - proc->arrival_time;  // time passed from arrival time to completion time
 	
 	*time_passed = *time_passed + (proc->burst_time);
@@ -43,8 +62,10 @@ void proc_fill_timedata(process * proc, int * time_passed)
 void proc_print_report(process * procs, int n) 
 {
 	float awt = 0, att = 0;
+	qsort(procs, n, sizeof(process), &comp_by_proc_num);
 	printf("\nP#\tAT\tBT\tCT\tTAT\tWT\n");
 	for(int i = 0; i < n; i++) {
+		int num = procs[i].proc_num;
 		int at = procs[i].arrival_time;
 		int bt = procs[i].burst_time;
 		int ct = procs[i].completion_time;
@@ -52,7 +73,7 @@ void proc_print_report(process * procs, int n)
 		int wt = procs[i].waiting_time;
 		awt += wt;
 		att += tat;
-		printf("P%d\t%d\t%d\t%d\t%d\t%d\n", i, at, bt, ct, tat, wt);
+		printf("P%d\t%d\t%d\t%d\t%d\t%d\n", num, at, bt, ct, tat, wt);
 	}
 	awt = awt / n;
 	att = att / n;
@@ -72,7 +93,8 @@ process * get_ptable(int n) {
 		get_int(&at, buf);
 		sprintf(buf,"input burst time of process #%d: ", i);
 		get_int(&bt, buf);
-
+		
+		ptable[i].proc_num = i;
 		ptable[i].completion_time = 0;
 		ptable[i].turnaround_time = 0;
 		ptable[i].waiting_time = 0;
@@ -89,16 +111,5 @@ void remove_ptable(process * ptable) {
 	free(ptable);
 }
 
-int comp_by_burst_time(const void * a, const void * b) {
-	process * p1 = (process *) a;
-	process * p2 = (process *) b;
-	return p1->burst_time - p2->burst_time;
-}
-
-int comp_by_arrival_time(const void * a, const void * b) {
-	process * p1 = (process *) a;
-	process * p2 = (process *) b;
-	return p1->arrival_time - p2->arrival_time;
-}
 
 #endif

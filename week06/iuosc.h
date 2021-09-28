@@ -26,7 +26,7 @@ int is_null(void * ptr) {
 int io_fail(char * fgets_return) {
 	if(is_null(fgets_return)) {
 		fprintf(stderr, "\ngot EOF, aborting...\n");
-		return 1;
+		exit(EXIT_FAILURE);
 	}
 	return 0;
 }

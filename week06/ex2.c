@@ -15,19 +15,19 @@ void scheduler_shortest_first(process * p, int n)
 		had_advance = FALSE;
 		// for every schedule, find the most suitable run candidate
 		for(int j = 0; j < n; j++) {
-			printf("time: %d\n", time_passed);
+			//printf("time: %d\n", time_passed);
 			char task_ready = (time_passed >= (p+j)->arrival_time);
 			if((p+j)->done) { continue; }
 			else if (!task_ready) {	continue; }
 			else {
-				printf("executing proc (%d, %d)\n",(p+j)->arrival_time, (p+j)->burst_time);
+				//printf("executing proc (%d, %d)\n",(p+j)->arrival_time, (p+j)->burst_time);
 				proc_fill_timedata(p+j, &time_passed);
 				done_procs++;	
 				had_advance = TRUE;
 			}
 		}
 		if(!had_advance) {
-			printf("nothing to execute this time\n");
+			//printf("nothing to execute this time\n");
 			++time_passed;
 		}
 	}
@@ -35,7 +35,7 @@ void scheduler_shortest_first(process * p, int n)
 
 int main() {
 	printf("===================================\n"
-	"Shortest task first scheduler\n"
+	"Shortest job first scheduler\n"
 	"===================================\n");
 	int n;
 	get_int(&n, "input number of processes: ");
