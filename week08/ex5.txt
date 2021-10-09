@@ -1,0 +1,6 @@
+Physical address is the real hardware address; using it, some physical RAM chip cell can be accessed.
+Virtual address is an abstraction for processes that:
+1) makes working with memory in user programs indifferent to the actual location in memory of the particular process; 
+for example, if the program wants to jump at some address 0x000fff (virtual), the process itself can be located anywhere in the physical memory; device called MMU effectively translates CPU requests to virtual addresses to physical ones that actually belong to this process.
+It is very useful in case of multiprogramming systems.
+2) makes user programs think they have unlimited amount of memory. Virtual memory pages consist of virtual addresses; physical page frames corresponding to these pages can be moved in or moved from the secondary memory (which is usually present in large amounts) on demand to give processes access to the particular page. This creates the illusion of unlimited main memory for processes.
