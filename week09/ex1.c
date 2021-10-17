@@ -1,14 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include "iuosc.h"
 
+#define BUFSIZE 80
 
-int BITS_NUMBER = sizeof(int) * 8;
+int BITS_NUMBER = sizeof(unsigned int) * 8;
 int PAGE_FRAMES = 3;
 int PAGE_HITS = 0;
 int PAGE_MISSES = 0;
-char filename[80] = "input.txt";
+char filename[BUFSIZE];
 
 typedef int pageno;
 typedef unsigned int ctr_t; 
@@ -19,36 +21,34 @@ typedef struct {
 } page;
 
 
-int find_page(page * pf, pageno pno) {
-	for(int i = 0; i < PAGE_FRAMES; i++) {
-		if((pf+i)->num == pno)
-			return i;
-	}
-	return -1;
-}
-
-
 int aging_replace_page(page * pf, pageno newpageno) {
 	page * evicted_page;
-	pageno oldest_page_ind=0;
-	ctr_t min_ctr;
-	if(!is_null(pf)) {
-		min_ctr=(pf+oldest_page_ind)->counter;
-	} else {
-		fprintf(stderr, "aging: error");
-		exit(EXIT_FAILURE);
-	}
-	for(int i = 1; i < PAGE_FRAMES; i++) {
-		if( (pf+i)->counter < min_ctr ) {
+	pageno oldest_page_ind = -1; // signed int, -1
+	ctr_t min_ctr = -1; // unsigned int, 2^31 - 1
+	for(int i = 0; i < PAGE_FRAMES; i++) {
+		if( (pf+i)->num == -1 ){
 			min_ctr = (pf+i)->counter;
 			oldest_page_ind = i;
+			break;
+		}
+		/*if (1) { // DEBUG
+			printf("%d. num: %d, counter: %u\n", i, (pf+i)->num, (pf+i)->counter);
+			printf("min_ctr: %u, oldest_page_ind: %d\n", min_ctr, oldest_page_ind);
+		}*/
+	}
+	if(oldest_page_ind == -1) {
+		for(int i = 0; i < PAGE_FRAMES; i++) {
+			if((pf+i)->counter < min_ctr) {
+				min_ctr = (pf+i)->counter;
+				oldest_page_ind = i;
+			}
 		}
 	}
 	evicted_page = (pf+oldest_page_ind);
 	fprintf(stderr, "aging: evicted pageno: %d, its age: %u\n", evicted_page->num, evicted_page->counter);
 	evicted_page->num = newpageno;
 	evicted_page->counter = (unsigned int) 1 << (BITS_NUMBER - 1);
-	fprintf(stderr, "aging: moved in pageno: %d, its age: %u\n", (evicted_page->num), evicted_page->counter);
+	fprintf(stderr, "aging: moved in pageno: %d, its age: %u, its index: %d\n", (evicted_page->num), evicted_page->counter, oldest_page_ind);
 	return 0;
 }
 
@@ -103,7 +103,7 @@ page * new_pageframes(int pf_no) {
 }
 
 void delete_pageframes(page * pf) {
-	fprintf(stderr, "fred page table");
+	fprintf(stderr, "freed page table\n");
 	free(pf);
 }
 
@@ -116,10 +116,11 @@ void handle_inputs(page * pf) {
 	}
 	pageno pno;
 	int code;
+	int i = 1;
 	do {
 		code = fscanf(openfile, "%d", &pno);
 		if(code == 1){
-			fprintf(stderr, "read file ok, obtained pageno %d\n", pno);
+			fprintf(stderr, "%d. read file ok, obtained pageno %d\n", i++, pno);
 			aging_algorithm(pf, pno);			
 		} else if (code == EOF) {
 			fprintf(stderr, "reached EOF while reading file\n");
@@ -132,13 +133,14 @@ void handle_inputs(page * pf) {
 }
 
 int handle_args(int argc, char ** argv) {
-	if (argc != 2) {
-		printf("usage: %s <number of pageframes>\n", argv[0]);
+	if (argc != 3) {
+		printf("usage: %s <input file> <number of pageframes>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	} else {
-		int num = atoi(argv[1]);
+		strncpy(filename, argv[1], 80);
+		int num = atoi(argv[2]);
 		if (num != 0) {
-			fprintf(stderr, "args read ok, returning %d as number of page frames\n", num);
+			fprintf(stderr, "args read ok, returning %d as number of page frames and %s as input filename\n", num, filename);
 		} else {
 			printf("error: number of page frames must be a positive integer number\n");
 			exit(EXIT_FAILURE);
@@ -148,7 +150,7 @@ int handle_args(int argc, char ** argv) {
 }
 
 void print_stats() {
-	printf("hit: %d\tmiss: %d\thit/miss ratio: %f\n", PAGE_HITS, PAGE_MISSES, (float)PAGE_HITS/PAGE_MISSES);
+	printf("hit: %d\t\tmiss: %d\t\thit/miss ratio: %f\n", PAGE_HITS, PAGE_MISSES, (float)PAGE_HITS/PAGE_MISSES);
 }
 
 int main(int argc, char ** argv) {
