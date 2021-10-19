@@ -6,8 +6,8 @@
 
 #define BUFSIZE 80
 
-int BITS_NUMBER = sizeof(unsigned int) * 8;
-int PAGE_FRAMES = 3;
+int BITS_NUMBER = 7;
+int PAGE_FRAMES = 0;
 int PAGE_HITS = 0;
 int PAGE_MISSES = 0;
 char filename[BUFSIZE];
@@ -18,6 +18,7 @@ typedef unsigned int ctr_t;
 typedef struct {
 	pageno num;
 	ctr_t counter;
+	char ref;
 } page;
 
 
