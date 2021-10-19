@@ -1,0 +1,3 @@
+Hit/miss ratio depends on the usage of pages present in the main memory. If different pages tend to be accessed frequently, there will be much more page faults compared to constant usage of the same pages; to increase number of page faults, we can access recently removed pages right  after they were  removed.
+For example, with 3 page frames sequence like 1 2 3 4 1 5 2 6 3 will lead to as much page faults as there are page references.
+Sequence like 1 2 3 2 3 1 5 2 3 will of course lead to lesser number of page faults.

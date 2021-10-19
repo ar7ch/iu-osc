@@ -13,98 +13,96 @@ int PAGE_MISSES = 0;
 char filename[BUFSIZE];
 
 typedef int pageno;
-typedef unsigned int ctr_t; 
+typedef int ctr_t; 
 
 typedef struct {
 	pageno num;
 	ctr_t counter;
-	char ref;
+	char refd;
 } page;
 
+int pageno_comp(const void * a, const void * b) {
+	const page * pa = (const page *) a;
+	const page * pb = (const page *) b;
+	ctr_t numa = pa->num;
+	ctr_t numb = pb->num;
+	return numa - numb;
+}
 
-int aging_replace_page(page * pf, pageno newpageno) {
-	page * evicted_page;
-	pageno oldest_page_ind = -1; // signed int, -1
-	ctr_t min_ctr = -1; // unsigned int, 2^31 - 1
-	for(int i = 0; i < PAGE_FRAMES; i++) {
-		if( (pf+i)->num == -1 ){
-			min_ctr = (pf+i)->counter;
-			oldest_page_ind = i;
-			break;
-		}
-		/*if (1) { // DEBUG
-			printf("%d. num: %d, counter: %u\n", i, (pf+i)->num, (pf+i)->counter);
-			printf("min_ctr: %u, oldest_page_ind: %d\n", min_ctr, oldest_page_ind);
-		}*/
-	}
-	if(oldest_page_ind == -1) {
-		for(int i = 0; i < PAGE_FRAMES; i++) {
-			if((pf+i)->counter < min_ctr) {
-				min_ctr = (pf+i)->counter;
-				oldest_page_ind = i;
-			}
-		}
-	}
-	evicted_page = (pf+oldest_page_ind);
-	fprintf(stderr, "aging: evicted pageno: %d, its age: %u\n", evicted_page->num, evicted_page->counter);
-	evicted_page->num = newpageno;
-	evicted_page->counter = (unsigned int) 1 << (BITS_NUMBER - 1);
-	fprintf(stderr, "aging: moved in pageno: %d, its age: %u, its index: %d\n", (evicted_page->num), evicted_page->counter, oldest_page_ind);
-	return 0;
+int find_page(page * pf, pageno target) {
+    for(int i = 0; i < PAGE_FRAMES; i++) {
+        if ((pf+i)->num == target) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 void add_reference_bit(page * pf) {
-	pf->counter |= (unsigned int)1 << (BITS_NUMBER - 1);
+	pf->counter |= 1 << BITS_NUMBER;
 }
 
 void add_age(page * pf) {
-	pf->counter >>= (unsigned int)1;
+	pf->counter = pf->counter >> 1;
 }
 
-int update_ctr_and_ref(page * pf, pageno targetpage) {
-	int had_hit = 0;
+void update_age(page * pf) {
+    for(int i = 0; i < PAGE_FRAMES; i++) {
+        add_age(pf+i);
+    }
+
+}
+
+void add_missing_refs(page * pf){
 	for(int i = 0; i < PAGE_FRAMES; i++) {
-		add_age(pf+i);
-		if((pf+i)->num == targetpage) {
-			fprintf(stderr, "aging: desired page %d is found in page table\n", targetpage);
+		if ((pf+i)->refd) {
 			add_reference_bit(pf+i);
-			had_hit = 1;
+			(pf+i)->refd = 0;
 		}
 	}
-	if (!had_hit) fprintf(stderr, "aging: page %d not found\n", targetpage);
-	return had_hit;
 }
 
-void aging_algorithm(page * pf, pageno target) {
-	fprintf(stderr, "aging: got page request with number %d\n", target);
-	int had_hit = update_ctr_and_ref(pf, target);
-	if (had_hit) {
-		fprintf(stderr, "aging: PAGE HIT\n");
-		PAGE_HITS++;
-	}
-	else {
-		fprintf(stderr, "aging: PAGE MISS\n");
-		PAGE_MISSES++;
-		aging_replace_page(pf, target);
-	}
+void aging_replace_page(page * pf, pageno newpageno) {
+    int evicted_ind = 0;
+    ctr_t min_ctr = pf->counter;
+	//qsort(pf, PAGE_FRAMES, sizeof(page), &pageno_comp);
+    for(int i = 0; i < PAGE_FRAMES; i++) {
+        if (((pf+i)->counter) < min_ctr || (pf+i)->num == -1) {
+            min_ctr = (pf+i)->counter;
+            evicted_ind = i;
+			if ((pf+i)->num == -1) break;
+        }
+    }
+    page * evicted_page = pf+evicted_ind;
+    fprintf(stderr, "evicted page num %d with counter %d\n", evicted_page->num, evicted_page->counter);
+    evicted_page->num = newpageno;
+    evicted_page->counter = 0;
+	evicted_page->refd = 1;
+	fprintf(stderr, "moved in pageno: %d, its age: %d, its index: %d\n", (evicted_page->num), evicted_page->counter, evicted_ind);
+}
+
+void find_or_replace(page * pf, pageno target) {
+    if (find_page(pf, target)) {
+        fprintf(stderr, "aging: PAGE HIT\n");
+        PAGE_HITS++;
+    } else {
+        fprintf(stderr, "aging: PAGE MISS\n");
+        PAGE_MISSES++;
+        aging_replace_page(pf, target);
+    }
 }
 
 page * new_pageframes(int pf_no) {
-	page * pf = malloc(sizeof(page) * pf_no);
-	if (is_null(pf)) {
-		fprintf(stderr, "failed to allocate page frames\n");
-	} else {
-		fprintf(stderr, "ok: allocate %d page frames\n", pf_no);
-	}
-	for(int i = 0; i < pf_no; i++) {
-		(pf+i)->num = -1;
-		(pf+i)->counter = 0;
-	}
-	return pf;
+    page * pf = malloc(sizeof(page) * pf_no);
+    for(int i = 0; i < pf_no; i++) {
+        (pf+i)->num = -1;
+        (pf+i)->counter = -1;
+		(pf+i)->refd = 0;
+    }
+    return pf;
 }
 
 void delete_pageframes(page * pf) {
-	fprintf(stderr, "freed page table\n");
 	free(pf);
 }
 
@@ -122,7 +120,9 @@ void handle_inputs(page * pf) {
 		code = fscanf(openfile, "%d", &pno);
 		if(code == 1){
 			fprintf(stderr, "%d. read file ok, obtained pageno %d\n", i++, pno);
-			aging_algorithm(pf, pno);			
+			update_age(pf);
+			add_missing_refs(pf);
+			find_or_replace(pf, pno);			
 		} else if (code == EOF) {
 			fprintf(stderr, "reached EOF while reading file\n");
 		} else {
