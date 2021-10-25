@@ -1,0 +1,4 @@
+3030077 ../week01/file.txt
+../week01/file.txt
+../week10/_ex2.txt
+../week01/file.txt

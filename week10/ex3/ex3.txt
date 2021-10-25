@@ -1,0 +1,8 @@
+remove execute permission for everybody
+-rw-rw-rw- 1 artem artem 12 окт 25 18:52 _ex3.txt
+add all permissions to owner
+-rwxrw-rw- 1 artem artem 12 окт 25 18:52 _ex3.txt
+add all permissions to other users
+-rwxrw-rwx 1 artem artem 12 окт 25 18:52 _ex3.txt
+set group permissions equal to user ones
+-rwxrwxrwx 1 artem artem 12 окт 25 18:52 _ex3.txt
