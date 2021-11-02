@@ -34,7 +34,6 @@ echo "RUNNING PROGRAM WITH CHROOT"
 chroot $LODIR /tmp/ex2.out # finally chroot and obtain result
 echo "RUNNING PROGRAM WITHOUT CHROOT"
 ./ex2.out
-
 # now for ex2.txt
 echo "RUNNING PROGRAM WITH CHROOT" > ex2.txt
 chroot lofsdisk /tmp/ex2.out >> ex2.txt # finally chroot and obtain result
