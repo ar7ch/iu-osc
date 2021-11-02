@@ -6,7 +6,7 @@ if [ $(whoami) != "root" ]; then
 	exit 1
 fi
 
-export LODIR=$(pwd)/lofsdisk
+LODIR=$(pwd)/lofsdisk
 
 function import_so () {
 	list="$(ldd /bin/{bash,cat,echo,ls,sh} | egrep -o '/lib.*\.[0-9]')"

@@ -7,14 +7,14 @@ if [ $(whoami) != "root" ]; then
 	exit 1
 fi
 
-export J=$(pwd)/lofsdisk
+LODIR=$(pwd)/lofsdisk
 
 fallocate -l 51M lofs.img # create empty file of 51M size
 ls -lh lofs.img # check this file
 losetup -f lofs.img # set lofs.img on available loopback device
 mkfs.ext4 lofs.img # create filesystem on file
-mkdir -p lofsdisk
-mount -t ext4 lofs.img lofsdisk # mount file
+mkdir -p $LODIR
+mount -t ext4 lofs.img $LODIR # mount file
 echo "image created and mounted"
 
 
