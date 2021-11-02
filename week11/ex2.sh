@@ -1,21 +1,37 @@
 #!/bin/bash
 
 # run as root
-# shared libraries names on Debian 11, can vary on other distros
+if [ $(whoami) != "root" ]; then 
+	echo "please run this script as root"
+	exit 1
+fi
 
-mkdir -p lofsdisk/{bin,tmp,lib,lib64} # create corresponding directories
-echo "a" > lofsdisk/file1
-echo "b" > lofsdisk/file2
-cp /bin/{bash,ls,echo,pwd,sh} lofsdisk/bin # copy binaries
-mkdir -p lofsdisk/lib/x86_64-linux-gnu
+export LODIR=$(pwd)/lofsdisk
+
+function import_so () {
+	list="$(ldd /bin/{bash,cat,echo,ls,sh} | egrep -o '/lib.*\.[0-9]')"
+	for i in $list;
+	do 
+		dest=$(echo $i | cut -d'/' -f2-)
+		cp  -vn "$i" $LODIR/$dest
+	done
+}
+
+
+mkdir -p $LODIR/{bin,tmp,lib,lib64} # create corresponding directories
+mkdir -p $LODIR/lib/x86_64-linux-gnu
+echo "a" > $LODIR/file1
+echo "b" > $LODIR/file2
+cp /bin/{bash,ls,echo,pwd,sh} $LODIR/bin # copy binaries
 # next, copy shared libraries (very painful)
-cp /lib/x86_64-linux-gnu/{libc.so.6,libpcre2-8.so.0,libselinux.so.1,libdl.so.2,libpthread.so.0,libtinfo.so.6} lofsdisk/lib/x86_64-linux-gnu/
-cp -r lofsdisk/lib lofsdisk/lib64
-cp /lib64/ld-linux-x86-64.so.2 lofsdisk/lib64
+# shared libraries names on Debian 11, can vary on other distros
+#cp /lib/x86_64-linux-gnu/{libc.so.6,libpcre2-8.so.0,libselinux.so.1,libdl.so.2,libpthread.so.0,libtinfo.so.6} lofsdisk/lib/x86_64-linux-gnu/
+# replaced hardcoded version with some smart copying
+import_so
 gcc ex2.c -o ex2.out 2> /dev/null # compile file
-cp ex2.out lofsdisk/tmp # copy file
+cp ex2.out $LODIR/tmp # copy file
 echo "RUNNING PROGRAM WITH CHROOT"
-chroot lofsdisk /tmp/ex2.out # finally chroot and obtain result
+chroot $LODIR /tmp/ex2.out # finally chroot and obtain result
 echo "RUNNING PROGRAM WITHOUT CHROOT"
 ./ex2.out
 

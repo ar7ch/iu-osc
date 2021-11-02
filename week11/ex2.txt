@@ -6,7 +6,7 @@ lib
 lib64
 lost+found
 tmp
-contents of root: <- output in reverse order because of stdout buffering
+contents of root: <- output order is reversed due to stdout buffering
 RUNNING PROGRAM WITHOUT CHROOT
 bin
 boot
