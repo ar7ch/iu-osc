@@ -1,0 +1,17 @@
+P+E -> prints ''I passed the Exam!''
+C+A+P -> prints ''Get some cappuccino!''
+O+R+L -> prints ''See you on the oral exam''
+
+I passed the Exam!
+
+I passed the Exam!
+
+I passed the Exam!
+
+See you on the oral exam
+
+See you on the oral exam
+
+Get some cappuccino
+
+Get some cappuccino
