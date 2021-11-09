@@ -1,10 +1,11 @@
-/proc/ioports contains the list of i/o ports (provided by device drivers) that are reserved for particular device for
-I/O communication with it. First column is i/o port range, the second is device name
-It is used for device drivers to see what i/o pins are taken and what are available.
+/proc/ioports contains the list of i/o ports (provided by device drivers) that are reserved for particular device for I/O communication with it. First column is i/o port range, the second is device name.
+This file is used for device drivers to know what i/o pins are taken and what are available.
 
-dma1 is direct memory access device allowing peripheral devices to access main memory without using the CPU. Using dma1 i/o ports, devices (using device drivers) can access some regions of RAM.
+If there are multiple devices of the same kind in the system, they are distinguished by a number at the end (timer0/timer1).
 
-pic1 is programmable interrupt controller that can queue and prioritize the interrupts for CPU to execute
+dma1 is a direct memory access device allowing peripheral devices to access main memory without using the CPU. Using dma1 i/o ports, devices (through device drivers) can access some regions of RAM.
+
+pic1 is a programmable interrupt controller that can queue and prioritize the interrupts for CPU to execute
 
 timer1 is hardware interrupt timer (used, for example, by Linux scheduler)
 

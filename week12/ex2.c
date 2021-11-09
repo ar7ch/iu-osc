@@ -15,14 +15,16 @@ int main() {
 		return 1;
 	}
 	struct input_event iev;
+	printf("Press any key\n==================\n");
+	fflush(stdout);
 	read(device, &iev, sizeof(struct input_event)); /* dump the input enter when running ./ex2 in terminal */
 	read(device, &iev, sizeof(struct input_event));  
 	while(1) {
 		read(device, &iev, sizeof(struct input_event));
 		if(iev.type != 4 && iev.code != EV_SYN) { 
-			// stderr is used because it is not buffered and gets printed immediately
-			if (iev.value == 1) fprintf(stderr, "PRESSED 0x%.4x (%d)\n", iev.code, iev.code); 
-			if (iev.value == 0) fprintf(stderr, "RELEASED 0x%.4x (%d)\n==================\n", iev.code, iev.code); 
+			if (iev.value == 1) printf("PRESSED 0x%.4x (%d)\n", iev.code, iev.code); 
+			if (iev.value == 0) printf("RELEASED 0x%.4x (%d)\n==================\n", iev.code, iev.code); 
+			fflush(stdout);
 		}
 	}
 	return 0;

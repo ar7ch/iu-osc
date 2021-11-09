@@ -39,12 +39,12 @@ char  responses3[NUM_PAT3][BUF_SIZE] = {"Get some cappuccino", "See you on the o
 // suppose we have X X P in queue and we need to add E, where X is code we don't care about
 // then it will evict the leftmost element, shift queue left and add E to the right, obtaining X P E 
 // after every append we check if the first N rightmost codes is the sequence we need 
-// stderr is used because it is not buffered and gets printed immediately
 
 
 list * buf;
 
 void check_seq() {
+	// first, check the match of sequences of 2 keys
 	int n = 2;
 	int match = 1;
 	unsigned short * dataN = NULL;
@@ -65,11 +65,13 @@ void check_seq() {
 			}
 			if(match) {
 				match = i;
-				fprintf(stderr, "\n%s\n", responses2[match]); 
+				fprintf(stdout, "\n%s\n", responses2[match]); 
+				fflush(stdout);
 				goto exit;
 			}
 		}
 	}
+	// three keys shortcut match
 	n = 3;
 	match = 1;
 	if(buf->size >= n) { 
@@ -90,7 +92,8 @@ void check_seq() {
 			}
 			if(match) {
 				match = i;
-				fprintf(stderr, "\n%s\n", responses3[match]);
+				fprintf(stdout, "\n%s\n", responses3[match]);
+				fflush(stdout);
 				goto exit;
 			}
 		}
@@ -154,7 +157,8 @@ int main() {
 		return 1;
 	}
 	struct input_event iev;
-	fprintf(stderr, "P+E -> prints ''I passed the Exam!''\nC+A+P -> prints ''Get some cappuccino!''\nO+R+L -> prints ''See you on the oral exam''\n");
+	fprintf(stdout, "P+E -> prints ''I passed the Exam!''\nC+A+P -> prints ''Get some cappuccino!''\nO+R+L -> prints ''See you on the oral exam''\n");
+	fflush(stdout);	
 	read(device, &iev, sizeof(struct input_event)); /* dump the input enter when running ./ex3 in terminal */
 	read(device, &iev, sizeof(struct input_event));  
 	new_list();
