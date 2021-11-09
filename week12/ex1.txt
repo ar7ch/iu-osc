@@ -2,7 +2,7 @@
 I/O communication with it. First column is i/o port range, the second is device name
 It is used for device drivers to see what i/o pins are taken and what are available.
 
-dma1 is direct memory access device allowing peripheral devices to access main memory without using the CPU. Using dma1 i/o ports, devices can access some regions of RAM.
+dma1 is direct memory access device allowing peripheral devices to access main memory without using the CPU. Using dma1 i/o ports, devices (using device drivers) can access some regions of RAM.
 
 pic1 is programmable interrupt controller that can queue and prioritize the interrupts for CPU to execute
 
