@@ -1,0 +1,29 @@
+Deadlock recovery:
+Recovery through preemtion: a resource is temporariliy taken away from process. 
+The process' progress is saved on preemption and then restored.
+
+Recovery through rollback:
+The checkpoints, or snapshots, of program execution and memory are frequently taken and stored.
+If the process holds the resource that is needed to resolve the deadlock, is it rolled back to the checkpoint when it wasn't holding that resource.
+The disadvantage is making snapshots is costly. 
+
+Recovery through killing processes:
+Kill some process in a random cycle. If the deadlock is not resolved, repeat.
+
+Recovery is an acceptable method for dealing with deadlocks if the processes' and resources' progress can easily be reproduced or rerun. 
+For example, killing a running compiler and restarting it is totally OK since no used resources (input file) are corrupt because of unsuccessful previous run.
+However, all recovery approaches have the same disadvantage: there are resources that cannot be rerun. Imagine if the resource is CD drive and the process is writing a data to write-once CD-R disk. If we revert it, a progress made to writing the disk will be discarded and the disk will corrupt.
+
+
+Dealing with deadlock with avoidance implies that the scheduler tries not to perform such allocations that may lead to deadlock. To be able to predict whether the processes' state is safe or unsafe, we need to know how much resources will be required by the process in total, so programs must know how much resources they will need in advance.
+This is rarely the case, and this is the reason deadlock avoidance algorithms are almost never used in practice, except for the systems that require from programmers to explicitly specify what resources will be used (mostly in mainframes)
+
+Deadlock prevention is the most common approach used in real systems. It exploits breaking the necessary and sufficient conditions of deadlock:
+1) Mutual exclusion of resources - e.g. instead of process directly accesing printer they output their requests in the spooling directory; these requests are queued and processes one-by-one by the printing daemon
+2) Hold and wait - prohibit process taking resources before they release previously taken
+3) No preemption - to allow preemption, resources can be virtualized, again the example of spooling
+4) Circular wait - allow to take the resources only in the certain order, e.g. by numbering it from 1 to N and prohibiting acquiring a resource with number lesser than current resource in use.
+
+However, sometimes it is not possible to eliminate these condtions for some resources. For example, databases require locking to avoid data races.
+
+To sum up, deadlock prevention is the most general approach that is commonly used. But with some constraints other ways can as well be applicable.
