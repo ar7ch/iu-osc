@@ -14,6 +14,12 @@ int ** R;
 int nproc;
 int nres;
 
+void free_eacr() {
+	free(E);
+	free(A);
+	free(C);
+	free(R);
+}
 
 void fetch_input() {
 	size_t tmpsize = sizeof(int) * ELEMENTS;
@@ -36,7 +42,7 @@ void fetch_input() {
 	nres = last_ind;
 
 	// get A
-	fgets(buf, BUF_SIZE, stdin);
+	fgets(buf, BUF_SIZE, stdin); // eat the blank delimiting newline
 	last_ind = 0;
 	tmp = malloc(nres*sizeof(int)); // not a leak, previous allocation is pointed by a global variable
 	fgets(buf, BUF_SIZE, stdin);
@@ -49,7 +55,7 @@ void fetch_input() {
 	A = tmp;
 	
 	// get C 
-	getchar();
+	fgets(buf, BUF_SIZE, stdin); // eat the blank delimiting newline
 	tmpsize = sizeof(int *) * ELEMENTS;
 	int ** tmp2 = malloc(tmpsize);	
 	fgets(buf, BUF_SIZE, stdin);
@@ -72,8 +78,8 @@ void fetch_input() {
 	}
 	C = tmp2;
 	nproc = last_ind;
-	fgets(buf, BUF_SIZE, stdin);
-	// get R 
+	// get R
+	fgets(buf, BUF_SIZE, stdin); // eat the blank delimiting newline
 	last_ind = 0;
 	tmp2 = malloc(sizeof(int *) * nproc);	
 	for(int i = 0; i < nproc; i++) {
@@ -171,8 +177,8 @@ void print_all_debug() {
 }
 
 int main() { 
-	//print_all_debug();
 	fetch_input();
+	//print_all_debug();
 	int res = will_deadlock();	
 	if(!res) {
 		printf("No deadlock detected\n");

@@ -1,6 +1,6 @@
 DEADLOCK RECOVERY:
 1) Recovery through preemption: a resource is temporarily taken away from the process.
-The process' progress is saved on preemption and then restored.
+The process' progress with the resource is saved on preemption and then restored.
 2) Recovery through rollback:
 The checkpoints, or snapshots, of program execution and memory, are frequently taken and stored.
 If the process holds the resource that is needed to resolve the deadlock, is it rolled back to the checkpoint when it wasn't holding that resource.
